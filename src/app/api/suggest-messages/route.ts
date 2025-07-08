@@ -7,7 +7,7 @@ export async function POST(req: Request) {
       "What’s a hobby you’ve recently started?",
       "If you could have dinner with any historical figure, who would it be?",
       "What’s a simple thing that makes you happy?"
-    ];
+    ]; 
 
     // Return the three questions directly
     return Response.json({ questions });

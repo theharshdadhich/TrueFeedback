@@ -40,7 +40,7 @@ export default function SendMessage() {
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
-  });
+  }); 
 
   const messageContent = form.watch('content');
 

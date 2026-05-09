@@ -22,10 +22,12 @@ export interface User extends Document {
   email: string;
   password: string;
   verifyCode: string;
-  verifyCodeExpiry: Date; 
+  verifyCodeExpiry: Date;
   isVerified: boolean;
   isAcceptingMessages: boolean;
   messages: Message[];
+  forgotPasswordToken?: string;
+  forgotPasswordTokenExpiry?: Date;
 }
 
 // Updated User schema
@@ -63,6 +65,12 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     default: true,
   },
   messages: [MessageSchema],
+  forgotPasswordToken: {
+    type: String,
+  },
+  forgotPasswordTokenExpiry: {
+    type: Date,
+  },
 });
 
 const UserModel =

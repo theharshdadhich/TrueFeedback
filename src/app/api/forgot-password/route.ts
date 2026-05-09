@@ -41,7 +41,10 @@ export async function POST(request: NextRequest) {
     user.forgotPasswordTokenExpiry = expiry;
     await user.save();
 
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    // Get the correct domain from request headers (handles deployed apps)
+    const host = request.headers.get('host') || 'localhost:3000';
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
     const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
     const emailResult = await sendForgotPasswordEmail(email, user.username, resetLink);

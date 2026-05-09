@@ -31,12 +31,16 @@ const parseStringMessages = (messageString: string): string[] => {
 };
 
 // Predefined message string
-const initialMessageString =
-    "What’s a hobby you’ve recently started? || If you could have dinner with any historical figure, who would it be? || What’s a simple thing that makes you happy?";
-
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
+  
+  const [suggestedMessages, setSuggestedMessages] = useState<string[]>([
+    "What’s a hobby you’ve recently started?",
+    "If you could have dinner with any historical figure, who would it be?",
+    "What’s a simple thing that makes you happy?"
+  ]);
+  const [isSuggestLoading, setIsSuggestLoading] = useState(false);
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
@@ -73,6 +77,25 @@ export default function SendMessage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchSuggestedMessages = async () => {
+    setIsSuggestLoading(true);
+    try {
+      const response = await axios.post<{ questions: string[] }>('/api/suggest-messages', { username });
+      if (response.data.questions && response.data.questions.length > 0) {
+        setSuggestedMessages(response.data.questions);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch message suggestions',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSuggestLoading(false);
     }
   };
 
@@ -118,17 +141,24 @@ export default function SendMessage() {
       <div className="space-y-4 my-8">
         <div className="space-y-2">
           <p>Click on any message below to select it.</p>
+          <Button
+            onClick={fetchSuggestedMessages}
+            disabled={isSuggestLoading}
+            className="mb-4"
+          >
+            {isSuggestLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Suggest New Messages'}
+          </Button>
         </div>
         <Card>
           <CardHeader>
             <h3 className="text-xl font-semibold">Messages</h3>
           </CardHeader>
           <CardContent className="flex flex-col space-y-4">
-            {parseStringMessages(initialMessageString).map((message, index) => (
+            {suggestedMessages.map((message, index) => (
               <Button
                 key={index}
                 variant="outline"
-                className="mb-2"
+                className="mb-2 whitespace-normal h-auto text-left justify-start"
                 onClick={() => handleMessageClick(message)}
               >
                 {message}

@@ -28,6 +28,7 @@ export interface User extends Document {
   messages: Message[];
   forgotPasswordToken?: string;
   forgotPasswordTokenExpiry?: Date;
+  profileContext?: string;
 }
 
 // Updated User schema
@@ -70,6 +71,9 @@ const UserSchema: Schema<User> = new mongoose.Schema({
   },
   forgotPasswordTokenExpiry: {
     type: Date,
+  },
+  profileContext: {
+    type: String,
   },
 });
 

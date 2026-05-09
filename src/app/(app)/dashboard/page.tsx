@@ -4,6 +4,7 @@ import { MessageCard } from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Message } from '@/model/User';
 import { ApiResponse } from '@/types/ApiResponse';
@@ -20,6 +21,8 @@ function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+  const [profileContext, setProfileContext] = useState('');
+  const [isContextLoading, setIsContextLoading] = useState(false);
 
   const { toast } = useToast();
 
@@ -55,6 +58,17 @@ function UserDashboard() {
     }
   }, [setValue, toast]);
 
+  const fetchProfileContext = useCallback(async () => {
+    try {
+      const response = await axios.get<{ success: boolean; profileContext: string }>('/api/update-context');
+      if (response.data.success) {
+        setProfileContext(response.data.profileContext);
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile context', error);
+    }
+  }, []);
+
   const fetchMessages = useCallback(
     async (refresh: boolean = false) => {
       setIsLoading(true);
@@ -89,9 +103,9 @@ function UserDashboard() {
     if (!session || !session.user) return;
 
     fetchMessages();
-
     fetchAcceptMessages();
-  }, [session, setValue, toast, fetchAcceptMessages, fetchMessages]);
+    fetchProfileContext();
+  }, [session, setValue, toast, fetchAcceptMessages, fetchMessages, fetchProfileContext]);
 
   // Handle switch change
   const handleSwitchChange = async () => {
@@ -113,6 +127,27 @@ function UserDashboard() {
           'Failed to update message settings',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleSaveContext = async () => {
+    setIsContextLoading(true);
+    try {
+      const response = await axios.post<{ success: boolean; message: string }>('/api/update-context', {
+        profileContext,
+      });
+      toast({
+        title: 'Success',
+        description: response.data.message,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile context',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsContextLoading(false);
     }
   };
 
@@ -160,6 +195,23 @@ function UserDashboard() {
         <span className="ml-2">
           Accept Messages: {acceptMessages ? 'On' : 'Off'}
         </span>
+      </div>
+      <Separator />
+
+      <div className="my-6">
+        <h2 className="text-lg font-semibold mb-2">AI Feedback Context</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Tell the AI what kind of feedback you are looking for. The AI will use this to generate relevant message suggestions for your visitors.
+        </p>
+        <Textarea
+          placeholder="e.g. I am a UI designer looking for feedback on my latest app design..."
+          value={profileContext}
+          onChange={(e) => setProfileContext(e.target.value)}
+          className="mb-4 resize-none h-24"
+        />
+        <Button onClick={handleSaveContext} disabled={isContextLoading}>
+          {isContextLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Save Context'}
+        </Button>
       </div>
       <Separator />
 

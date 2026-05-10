@@ -83,7 +83,7 @@ function InsightsWidget() {
                 <p className="text-sm text-gray-700">{cluster.summary}</p>
                 {cluster.representativeQuote && (
                   <blockquote className="text-sm italic text-gray-500 border-l-2 border-gray-300 pl-3">
-                    "{cluster.representativeQuote}"
+                    &ldquo;{cluster.representativeQuote}&rdquo;
                   </blockquote>
                 )}
               </CardContent>

@@ -1,5 +1,3 @@
-import { kmeans } from "ml-kmeans";
-
 declare module 'ml-kmeans' {
   export type InitializationMethod = 'kmeans++' | 'random' | 'mostDistant';
 

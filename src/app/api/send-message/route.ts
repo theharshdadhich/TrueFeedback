@@ -44,10 +44,10 @@ async function embedAndLocalize(content: string): Promise<{
 }
 
 export async function POST(request: Request) {
-  await dbConnect();
-  const { username, content } = await request.json();
-
   try {
+    await dbConnect();
+    const { username, content } = await request.json();
+
     const user = await UserModel.findOne({ username }).exec();
 
     if (!user) {
@@ -83,8 +83,9 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Error adding message:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
     return Response.json(
-      { message: 'Internal server error', success: false },
+      { message, success: false },
       { status: 500 }
     );
   }

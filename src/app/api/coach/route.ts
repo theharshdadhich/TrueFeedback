@@ -40,9 +40,12 @@ Analyze the feedback to help the user grow. Answer their questions constructivel
     const { stream, handlers } = LangChainStream();
 
     const model = new ChatOpenAI({
-      modelName: 'gpt-4o-mini',
+      modelName: process.env.AI_MODEL_NAME || 'gpt-4o-mini',
       streaming: true,
       temperature: 0.7,
+      configuration: {
+        baseURL: process.env.OPENAI_BASE_URL,
+      }
     });
 
     const langChainMessages = [

@@ -34,8 +34,11 @@ export async function POST(req: Request) {
 
     const prompt = PromptTemplate.fromTemplate(promptText);
     const model = new ChatOpenAI({
-      modelName: 'gpt-4o-mini',
+      modelName: process.env.AI_MODEL_NAME || 'gpt-4o-mini',
       temperature: 0.7,
+      configuration: {
+        baseURL: process.env.OPENAI_BASE_URL,
+      }
     });
     const parser = new StringOutputParser();
 

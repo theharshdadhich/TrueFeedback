@@ -3,6 +3,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface Message extends Document {
   content: string;
   createdAt: Date;
+  vector: number[];
+  detectedLanguage?: string;
+  contentTranslated?: string;
+  tone?: string;
 }
 
 const MessageSchema: Schema<Message> = new mongoose.Schema({
@@ -14,6 +18,19 @@ const MessageSchema: Schema<Message> = new mongoose.Schema({
     type: Date,
     required: true,
     default: Date.now,
+  },
+  vector: {
+    type: [Number],
+    default: [],
+  },
+  detectedLanguage: {
+    type: String,
+  },
+  contentTranslated: {
+    type: String,
+  },
+  tone: {
+    type: String,
   },
 });
 
@@ -29,9 +46,9 @@ export interface User extends Document {
   forgotPasswordToken?: string;
   forgotPasswordTokenExpiry?: Date;
   profileContext?: string;
+  coachMemory?: string;
 }
 
-// Updated User schema
 const UserSchema: Schema<User> = new mongoose.Schema({
   username: {
     type: String,
@@ -73,6 +90,9 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     type: Date,
   },
   profileContext: {
+    type: String,
+  },
+  coachMemory: {
     type: String,
   },
 });
